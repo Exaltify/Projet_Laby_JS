@@ -7,6 +7,8 @@ var tabMur;
 
 // ---------- elements
 var joueur;
+var directions = new Array('Droite','Haut','Gauche','Bas');
+var cptAnimation = 1;
 var bonus = new Array();
 var bonusType = new Array('Tresor','Diamant','Horloge','Bottes','Sortie');
 
@@ -42,24 +44,30 @@ class Joueur extends Element {
 		this.score = 0;
 		this.name = name;
 		this.speed = 4;
+		this.direction = directions[3];
+		this.enMouvement = false;
 	}	
 	
-	deplacer(event) {
+	deplacerKeyDown(event) {
 		switch(event.keyCode) {
 		case 39: //  droite
-			if(joueur.posX < 380)joueur.posX+= joueur.speed;
+			joueur.direction = directions[0];
+			joueur.enMouvement = true;
 			break;
 
 		case 38: //  haut
-			if(joueur.posY>0)joueur.posY-= joueur.speed;
+			joueur.direction = directions[1];
+			joueur.enMouvement = true;
 			break;
 
-		case 37: // gauche
-			if(joueur.posX>0)joueur.posX-= joueur.speed;
+		case 37: // gauche			
+			joueur.direction = directions[2];
+			joueur.enMouvement = true;
 			break;
 
-		case 40: //  bas
-			if(joueur.posY<380)joueur.posY+= joueur.speed;
+		case 40: //  bas			
+			joueur.direction = directions[3];
+			joueur.enMouvement = true;
 			break;
 		}
 		if(!started) {
@@ -68,13 +76,19 @@ class Joueur extends Element {
         }
 	}
 	
+	deplacerKeyUp(event) {
+		joueur.enMouvement = false;
+	}
+	
 	refreshJoueur() {
 		this.img.style.left = this.posX+'px';
 		this.img.style.top = this.posY+'px';
+		this.animate();
 	}
+	
 	loadJoueur() {
 		this.img = document.createElement("img");
-		this.img.src="images/mrpeanut.png";
+		this.img.src="images/joueur/bas/Bas0.png";
 		this.img.width=this.taille;
 		this.img.height=this.taille;
 		this.img.style.position="absolute";
@@ -83,6 +97,46 @@ class Joueur extends Element {
 		this.img.style.left=this.taille*this.posY+"px";
 		this.img.style.visibility = "visible";
 		joueur.refreshJoueur();
+	}
+	
+	animate() {
+		if(this.enMouvement) {
+			switch(this.direction) {
+				case 'Droite' : 
+					if(joueur.posX < field.pxWidth - field.tailleCase)joueur.posX+= joueur.speed;
+					this.img.src="images/joueur/droite/Droite"+cptAnimation+".png";
+					break;
+				case 'Haut' : 
+					if(joueur.posY>0)joueur.posY-= joueur.speed;
+					this.img.src="images/joueur/haut/Haut"+cptAnimation+".png";
+					break;
+				case 'Gauche' : 
+					if(joueur.posX>0)joueur.posX-= joueur.speed;
+					this.img.src="images/joueur/gauche/Gauche"+cptAnimation+".png";
+					break;
+				case 'Bas' : 
+					if(joueur.posY< field.pxHeight - field.tailleCase)joueur.posY+= joueur.speed;
+					this.img.src="images/joueur/bas/Bas"+cptAnimation+".png";
+					break;
+			}
+			cptAnimation = (cptAnimation + 1) % 9;
+		}
+		else {
+			switch(this.direction) {
+				case 'Droite' : 
+					this.img.src="images/joueur/droite/Droite0.png";
+					break;
+				case 'Haut' : 
+					this.img.src="images/joueur/haut/Haut0.png";
+					break;
+				case 'Gauche' : 
+					this.img.src="images/joueur/gauche/Gauche0.png";
+					break;
+				case 'Bas' : 
+					this.img.src="images/joueur/bas/Bas0.png";
+					break;
+			}
+		}
 	}
 }
 
@@ -218,19 +272,31 @@ class Mur extends Element {
 		this.img.style.visibility = "visible";
 	}
 }
-// ------------------------------------ Fonctions
+// -------------------------------------- Fonctions
 
 function load() {
 	initField();
 	initJoueur();
 	initBonus();
-	document.getElementById('container').addEventListener("keydown",joueur.deplacer);
+	initEventListener();	
 	refresh();
+}
+
+function refresh() {
+	joueur.refreshJoueur();
+	for(var i=0;i<bonus.length;i++) {
+		if(collision(bonus[i]))
+			bonus[i].ramasser();
+	}
+	refreshScore();
+	setTimeout(refresh,1000/30);
 }
 
 function initField() {
 	divField = document.getElementById("terrain");
-	field = new Field(400,400,20);
+	field = new Field(800,800,40);
+	divField.style.width = field.pxWidth+'px';
+	divField.style.height = field.pxHeight+'px';
 	field.loadMap();
 }
 
@@ -262,22 +328,16 @@ function initBonus() {
         bonus[i].loadBonus();
 }
 
-function refresh() {
-	joueur.refreshJoueur();
-	for(var i=0;i<bonus.length;i++) {
-		if(collision(bonus[i]))
-			bonus[i].ramasser();
-	}
-	refreshScore();
-	setTimeout(refresh,1000/30);
+function initEventListener() {
+	document.getElementById('container').addEventListener("keydown",joueur.deplacerKeyDown);
+	document.getElementById('container').addEventListener("keyup",joueur.deplacerKeyUp);
 }
 
-function collision(elem) {
-	
-    return !(joueur.posX >= elem.posX + 15
-    || joueur.posX + 15 <= elem.posX
-    || joueur.posY >= elem.posY + 15
-    || joueur.posY + 15 <= elem.posY);
+function collision(elem) {	
+    return !(joueur.posX >= elem.posX + elem.taille
+    || joueur.posX + joueur.taille <= elem.posX
+    || joueur.posY >= elem.posY + elem.taille
+    || joueur.posY + joueur.taille <= elem.posY);
 }
 
 function refreshScore() {
@@ -287,6 +347,9 @@ function refreshScore() {
 function isAMur(i, j) {
     return (field.map[i][j]==0);
 }
+
+// ------------ Animation du joueur
+
 
 // -------------------------- Chrono
 
