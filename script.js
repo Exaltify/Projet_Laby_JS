@@ -1,4 +1,5 @@
-// ----------------------------- Variables
+// ----------------------------- Variables globales
+
 // --------- terrain
 var divField;
 var field;
@@ -32,7 +33,7 @@ class Element {	// Definition de l'objet
 
 
 
-// ------------------------------- Joueur
+// ---------- Joueur
 
 class Joueur extends Element {
 	
@@ -85,13 +86,12 @@ class Joueur extends Element {
 	}
 }
 
-//------------------------------ Bonus
+//------------- Bonus
 class Bonus extends Element {
 	
 	constructor(posX,posY,type) {
 		super(posX,posY);
 		this.type = type;
-		this.taille=field.tailleCase;
 		switch(this.type) {
 		case 'Tresor' :
 			this.score = 500;
@@ -146,7 +146,7 @@ class Bonus extends Element {
 		joueur.score += this.score;
 		switch (this.type) {
             case 'Horloge' :
-                duree = (parseInt(duree,10) + 30);
+                duree = parseInt(duree,10) + 30;
                 break;
             case 'Bottes' :
                 joueur.speed *= 2;
@@ -164,7 +164,7 @@ class Bonus extends Element {
 	}
 }
 
-// ---------------------------- Field & Mur
+// ---------- Field & Mur
 
 class Field {
 	
@@ -218,16 +218,20 @@ class Mur extends Element {
 		this.img.style.visibility = "visible";
 	}
 }
-// --------------------------- Fonctions
+// ------------------------------------ Fonctions
 
 function load() {
-	divField = document.getElementById("terrain");
-	field = new Field(400,400,20);
-	field.loadMap();
+	initField();
 	initJoueur();
 	initBonus();
 	document.getElementById('container').addEventListener("keydown",joueur.deplacer);
 	refresh();
+}
+
+function initField() {
+	divField = document.getElementById("terrain");
+	field = new Field(400,400,20);
+	field.loadMap();
 }
 
 function initJoueur() {
@@ -238,13 +242,19 @@ function initJoueur() {
     joueur.loadJoueur();
 }
 
-
 function initBonus() {
     for (var i = 0; i < 5; i++) {
         do {
             var randomX = Math.floor((Math.random() * field.width));
             var randomY = Math.floor((Math.random() * field.height));
-            if (bonusType[i]=="Sortie") randomY=19;
+            switch(bonusType[i]) {
+				case "Sortie" :
+					randomY = 19;
+					break;
+				case "Bottes" :
+					if(randomY>10) randomY = Math.floor((Math.random() * Math.floor(field.height/2)));
+					 break;
+			}
         } while (isAMur(randomY, randomX));
         bonus.push(new Bonus(randomX * field.tailleCase, randomY * field.tailleCase, bonusType[i]));
     }
@@ -262,12 +272,12 @@ function refresh() {
 	setTimeout(refresh,1000/30);
 }
 
-function collision(el) {
+function collision(elem) {
 	
-    return !(joueur.posX >= el.posX + 15
-    || joueur.posX + 15 <= el.posX
-    || joueur.posY >= el.posY + 15
-    || joueur.posY + 15 <= el.posY);
+    return !(joueur.posX >= elem.posX + 15
+    || joueur.posX + 15 <= elem.posX
+    || joueur.posY >= elem.posY + 15
+    || joueur.posY + 15 <= elem.posY);
 }
 
 function refreshScore() {
@@ -286,9 +296,7 @@ function timer()
     var s=duree;
     var m = 0;
     if(s<0)
-    {
         compteur.innerHTML="Perdu !"
-    }
     else
     {
         if(s>59)
@@ -315,56 +323,56 @@ function timer()
 
 
 function generatePath() {
-    while(!isLabyrinthPerfect()) {
+    while(!labyParfait()) {
         do {
             var index = Math.floor((Math.random() * tabMur.length));
             var randomMur = tabMur[index];
-            var tabNeighbors = getNeighbors(randomMur.posX, randomMur.posY);
-        } while (tabNeighbors.length == 0 || areNeighborsTheSame(tabNeighbors));
+            var tabVoisins = getVoisins(randomMur.posX, randomMur.posY);
+        } while (tabVoisins.length == 0 || voisinsMemeZone(tabVoisins));
         divField.removeChild(tabMur[index].img);
         tabMur.splice(index, 1);
-        var firstNeighbor = tabNeighbors[Math.floor((Math.random() * tabNeighbors.length))];
-        fillZone(randomMur.posX, randomMur.posY, field.map[firstNeighbor[0]][firstNeighbor[1]]);
+        var premierVoisin = tabVoisins[Math.floor((Math.random() * tabVoisins.length))];
+        remplirZone(randomMur.posX, randomMur.posY, field.map[premierVoisin[0]][premierVoisin[1]]);
     }
 }
 
-function getNeighbors(i, j) {
-    tabNeighbors = [];
-    if(j>0 && field.map[i][j-1]!=0) tabNeighbors.push([i, j-1]); //voisin gauche
-    if(j<field.width-1 && field.map[i][j+1]!=0) tabNeighbors.push([i, j+1]); //voisin droit
-    if(i>0 && field.map[i-1][j]!=0) tabNeighbors.push([i-1, j]); //voisin haut
-    if(i<field.height-1 && field.map[i+1][j]!=0) tabNeighbors.push([i+1, j]); //voisin bas
-    return tabNeighbors;
+function getVoisins(i, j) {
+    tabVoisins = [];
+    if(j>0 && field.map[i][j-1]!=0) tabVoisins.push([i, j-1]); //voisin gauche
+    if(j<field.width-1 && field.map[i][j+1]!=0) tabVoisins.push([i, j+1]); //voisin droit
+    if(i>0 && field.map[i-1][j]!=0) tabVoisins.push([i-1, j]); //voisin haut
+    if(i<field.height-1 && field.map[i+1][j]!=0) tabVoisins.push([i+1, j]); //voisin bas
+    return tabVoisins;
 }
 
-function areNeighborsTheSame(tabNeighbors) {
+function voisinsMemeZone(tabVoisins) {
     var valueTab = [];
-    if(tabNeighbors.length<2) {return false;}
-    valueTab.push(field.map[tabNeighbors[0][0]][tabNeighbors[0][1]]);
-    for(var i=0; i<tabNeighbors.length; i++) {
+    if(tabVoisins.length<2) {return false;}
+    valueTab.push(field.map[tabVoisins[0][0]][tabVoisins[0][1]]);
+    for(var i=0; i<tabVoisins.length; i++) {
         for(var j=0; j<valueTab.length; j++) {
-            if(field.map[tabNeighbors[i][0]][tabNeighbors[i][1]]!=valueTab[j]) {
+            if(field.map[tabVoisins[i][0]][tabVoisins[i][1]]!=valueTab[j]) {
                 return false;
             }
         }
-        valueTab[i]=field.map[tabNeighbors[i][0]][tabNeighbors[i][1]];
+        valueTab[i]=field.map[tabVoisins[i][0]][tabVoisins[i][1]];
     }
     return true;
 }
 
-function fillZone(i, j, value) {
+function remplirZone(i, j, value) {
     if(field.map[i][j]!=value) {
-        var tabNeighbors = getNeighbors(i, j);
+        var tabVoisins = getVoisins(i, j);
         field.map[i][j] = value;
-        if(tabNeighbors.length!=0) {
-            for(var k = 0, count=tabNeighbors.length; k < count; k++) {
-                fillZone(tabNeighbors[k][0], tabNeighbors[k][1], value);
+        if(tabVoisins.length!=0) {
+            for(var k = 0, count=tabVoisins.length; k < count; k++) {
+                remplirZone(tabVoisins[k][0], tabVoisins[k][1], value);
             }
         }
     }
 }
 
-function isLabyrinthPerfect() {
+function labyParfait() {
 	if(field.map[1][1] != -1) {
 		var value = field.map[1][1];
 		for(var i=0; i<field.height; i++){
