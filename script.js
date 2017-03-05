@@ -8,7 +8,7 @@ var tabMur;
 // ---------- elements
 var joueur;
 var directions = new Array('Droite','Haut','Gauche','Bas');
-var cptAnimation = 1;
+var cptAnimation = 0;
 var bonus = new Array();
 var bonusType = new Array('Tresor','Diamant','Horloge','Bottes','Sortie');
 
@@ -122,6 +122,7 @@ class Joueur extends Element {
 			cptAnimation = (cptAnimation + 1) % 9;
 		}
 		else {
+			cptAnimation = 0;
 			switch(this.direction) {
 				case 'Droite' : 
 					this.img.src="images/joueur/droite/Droite0.png";
@@ -285,7 +286,7 @@ function load() {
 function refresh() {
 	joueur.refreshJoueur();
 	for(var i=0;i<bonus.length;i++) {
-		if(collision(bonus[i]))
+		if(collisionAvecJoueur(bonus[i]))
 			bonus[i].ramasser();
 	}
 	refreshScore();
@@ -333,11 +334,11 @@ function initEventListener() {
 	document.getElementById('container').addEventListener("keyup",joueur.deplacerKeyUp);
 }
 
-function collision(elem) {	
+function collisionAvecJoueur(elem) {	
     return !(joueur.posX >= elem.posX + elem.taille
-    || joueur.posX + joueur.taille <= elem.posX
+    || joueur.posX + Math.floor(joueur.taille*0.75) <= elem.posX
     || joueur.posY >= elem.posY + elem.taille
-    || joueur.posY + joueur.taille <= elem.posY);
+    || joueur.posY + Math.floor(joueur.taille*0.75) <= elem.posY);
 }
 
 function refreshScore() {
@@ -347,8 +348,6 @@ function refreshScore() {
 function isAMur(i, j) {
     return (field.map[i][j]==0);
 }
-
-// ------------ Animation du joueur
 
 
 // -------------------------- Chrono
