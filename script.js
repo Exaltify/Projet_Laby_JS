@@ -139,6 +139,14 @@ class Joueur extends Element {
 			}
 		}
 	}
+	
+	getColonne() {
+		return Math.floor(this.posX/field.tailleCase);
+	}
+	
+	getLigne() {
+		return Math.floor(this.posY/field.tailleCase);
+	}
 }
 
 //------------- Bonus
@@ -286,7 +294,7 @@ function load() {
 function refresh() {
 	joueur.refreshJoueur();
 	for(var i=0;i<bonus.length;i++) {
-		if(collisionAvecJoueur(bonus[i]))
+		if(collisionElementJoueur(bonus[i]))
 			bonus[i].ramasser();
 	}
 	refreshScore();
@@ -334,13 +342,6 @@ function initEventListener() {
 	document.getElementById('container').addEventListener("keyup",joueur.deplacerKeyUp);
 }
 
-function collisionAvecJoueur(elem) {	
-    return !(joueur.posX >= elem.posX + elem.taille
-    || joueur.posX + Math.floor(joueur.taille*0.75) <= elem.posX
-    || joueur.posY >= elem.posY + elem.taille
-    || joueur.posY + Math.floor(joueur.taille*0.75) <= elem.posY);
-}
-
 function refreshScore() {
 	document.getElementById("score").innerHTML = "Score : "+joueur.score;
 }
@@ -349,6 +350,14 @@ function isAMur(i, j) {
     return (field.map[i][j]==0);
 }
 
+// --------- Collision
+
+function collisionElementJoueur(elem) {	
+    return !(joueur.posX >= elem.posX + elem.taille
+    || joueur.posX + Math.floor(joueur.taille*0.75) <= elem.posX
+    || joueur.posY >= elem.posY + elem.taille
+    || joueur.posY + Math.floor(joueur.taille*0.75) <= elem.posY);
+}
 
 // -------------------------- Chrono
 
