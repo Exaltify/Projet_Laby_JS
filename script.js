@@ -17,7 +17,7 @@ var bonusType = new Array('Tresor','Diamant','Horloge','Bottes','Sortie');
 var duree="60";
 var started=false;
 
-
+var echo; // à supprimer, c'est pour print sans alert();
 
 
 // ---------------------------------- Classes
@@ -30,6 +30,14 @@ class Element {	// Definition de l'objet
 		this.posY = posY;
 		this.taille = field.tailleCase;
 
+	}
+	
+	getColonne() {
+		return Math.floor(this.posX/field.tailleCase);
+	}
+	
+	getLigne() {
+		return Math.floor(this.posY/field.tailleCase);
 	}
 }
 
@@ -103,19 +111,32 @@ class Joueur extends Element {
 		if(this.enMouvement) {
 			switch(this.direction) {
 				case 'Droite' : 
-					if(joueur.posX < field.pxWidth - field.tailleCase)joueur.posX+= joueur.speed;
+					if((joueur.posX < field.pxWidth - field.tailleCase)&&!collisionMurJoueur())
+						joueur.posX+= joueur.speed;
 					this.img.src="images/joueur/droite/Droite"+cptAnimation+".png";
 					break;
 				case 'Haut' : 
-					if(joueur.posY>0)joueur.posY-= joueur.speed;
+					if(joueur.posY>0) {
+						if(!collisionMurJoueur()) 
+							joueur.posY-= joueur.speed;
+						else
+							joueur.posY+= joueur.speed;
+					}
 					this.img.src="images/joueur/haut/Haut"+cptAnimation+".png";
 					break;
 				case 'Gauche' : 
-					if(joueur.posX>0)joueur.posX-= joueur.speed;
+					if(joueur.posX>0) {
+						if(!collisionMurJoueur())
+							joueur.posX-= joueur.speed;
+						else
+							joueur.posX+= joueur.speed;
+						
+					}
 					this.img.src="images/joueur/gauche/Gauche"+cptAnimation+".png";
 					break;
 				case 'Bas' : 
-					if(joueur.posY< field.pxHeight - field.tailleCase)joueur.posY+= joueur.speed;
+					if((joueur.posY< field.pxHeight - field.tailleCase)&&!collisionMurJoueur())
+						joueur.posY+= joueur.speed;
 					this.img.src="images/joueur/bas/Bas"+cptAnimation+".png";
 					break;
 			}
@@ -138,14 +159,7 @@ class Joueur extends Element {
 					break;
 			}
 		}
-	}
-	
-	getColonne() {
-		return Math.floor(this.posX/field.tailleCase);
-	}
-	
-	getLigne() {
-		return Math.floor(this.posY/field.tailleCase);
+	//	echo.innerHTML += "Position : " + this.posX + ' - ' + this.posY + '----';
 	}
 }
 
@@ -284,6 +298,7 @@ class Mur extends Element {
 // -------------------------------------- Fonctions
 
 function load() {
+	echo = document.getElementById('echo'); // à supprimer
 	initField();
 	initJoueur();
 	initBonus();
@@ -294,7 +309,7 @@ function load() {
 function refresh() {
 	joueur.refreshJoueur();
 	for(var i=0;i<bonus.length;i++) {
-		if(collisionElementJoueur(bonus[i]))
+		if(collisionAABB(joueur,bonus[i],0.75,1))
 			bonus[i].ramasser();
 	}
 	refreshScore();
@@ -346,18 +361,62 @@ function refreshScore() {
 	document.getElementById("score").innerHTML = "Score : "+joueur.score;
 }
 
-function isAMur(i, j) {
+function isAMurElement(elem) {
+	var i = normalizeLigne(elem.getLigne());
+	var j = normalizeColonne(elem.getColonne());
+	return isAMur(i,j);
+}
+
+function isAMur(i,j) {
     return (field.map[i][j]==0);
+}
+
+function normalizeColonne(unsafeX) {
+	retour = unsafeX;
+	if(retour < 0) retour = 0;
+	if(retour > field.width - 1) retour = field.width - 1;
+	return retour;
+}
+
+function normalizeLigne(unsafeY) {
+	retour = unsafeY;
+	if(retour < 0) retour = 0;
+	if(retour > field.height - 1) retour = field.height - 1;
+	return retour;
 }
 
 // --------- Collision
 
-function collisionElementJoueur(elem) {	
-    return !(joueur.posX >= elem.posX + elem.taille
-    || joueur.posX + Math.floor(joueur.taille*0.75) <= elem.posX
-    || joueur.posY >= elem.posY + elem.taille
-    || joueur.posY + Math.floor(joueur.taille*0.75) <= elem.posY);
+function collisionAABB(elem1, elem2, correcteur1, correcteur2) {	
+    return !(elem1.posX >= elem2.posX + Math.floor(elem2.taille*correcteur2)
+    || elem1.posX + Math.floor(elem1.taille*correcteur1) <= elem2.posX
+    || elem1.posY >= elem2.posY + Math.floor(elem2.taille*correcteur2)
+    || elem1.posY + Math.floor(elem1.taille*correcteur1) <= elem2.posY);
 }
+
+function collisionMurJoueur(direction) {
+	return isAMurElement(getProchaineCase());
+}
+
+function getProchaineCase() {
+	var retour;
+	switch(joueur.direction) {
+		case 'Droite' : 
+			retour = new Element(joueur.posX+joueur.taille,joueur.posY);
+			break;
+		case 'Haut' : 
+			retour = new Element(joueur.posX, joueur.posY);
+			break;
+		case 'Gauche' : 
+			retour = new Element(joueur.posX,joueur.posY);	
+			break;
+		case 'Bas' : 
+			retour = new Element(joueur.posX, joueur.posY+joueur.taille);;
+			break;
+	}
+	return retour;
+}
+
 
 // -------------------------- Chrono
 
