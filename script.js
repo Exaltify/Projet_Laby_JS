@@ -120,7 +120,8 @@ class Joueur extends Element {
 						if(!collisionMurJoueur()) 
 							joueur.posY-= joueur.speed;
 						else
-							joueur.posY+= joueur.speed;
+							if(joueur.posY > (joueur.getLigne()*field.tailleCase))
+								joueur.posY-= joueur.speed;
 					}
 					this.img.src="images/joueur/haut/Haut"+cptAnimation+".png";
 					break;
@@ -129,7 +130,8 @@ class Joueur extends Element {
 						if(!collisionMurJoueur())
 							joueur.posX-= joueur.speed;
 						else
-							joueur.posX+= joueur.speed;
+							if(joueur.posX > (joueur.getColonne()*field.tailleCase))
+								joueur.posX-= joueur.speed;
 						
 					}
 					this.img.src="images/joueur/gauche/Gauche"+cptAnimation+".png";
@@ -403,15 +405,23 @@ function getProchaineCase() {
 	switch(joueur.direction) {
 		case 'Droite' : 
 			retour = new Element(joueur.posX+joueur.taille,joueur.posY);
+			if (retour.posY % field.tailleCase > Math.floor(field.tailleCase / 2))
+				retour.posY += field.tailleCase;
 			break;
 		case 'Haut' : 
-			retour = new Element(joueur.posX, joueur.posY);
+			retour = new Element(joueur.posX, joueur.posY-joueur.taille);
+			if (retour.posX % field.tailleCase > Math.floor(field.tailleCase / 2))
+				retour.posX += field.tailleCase;
 			break;
-		case 'Gauche' : 
-			retour = new Element(joueur.posX,joueur.posY);	
+		case 'Gauche' :
+			retour = new Element(joueur.posX-joueur.taille,joueur.posY);
+			if (retour.posY % field.tailleCase > Math.floor(field.tailleCase / 2))
+				retour.posY += field.tailleCase;
 			break;
 		case 'Bas' : 
-			retour = new Element(joueur.posX, joueur.posY+joueur.taille);;
+			retour = new Element(joueur.posX, joueur.posY+joueur.taille);
+			if (retour.posX % field.tailleCase > Math.floor(field.tailleCase / 2))
+				retour.posX += field.tailleCase;
 			break;
 	}
 	return retour;
