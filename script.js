@@ -38,7 +38,7 @@ class Element {	// Definition de l'objet
 	
 	getLigne() {
 		return Math.floor(this.posY/field.tailleCase);
-	}
+	}	
 }
 
 
@@ -159,7 +159,6 @@ class Joueur extends Element {
 					break;
 			}
 		}
-	//	echo.innerHTML += "Position : " + this.posX + ' - ' + this.posY + '----';
 	}
 }
 
