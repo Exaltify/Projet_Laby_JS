@@ -28,7 +28,7 @@ class Element {	// Definition de l'objet
 	constructor(posX, posY) {
 		this.posX = posX;
 		this.posY = posY;
-		this.taille = field.tailleCase;
+		this.taille = field.tailleCase * 0.9;
 
 	}
 	
@@ -282,6 +282,7 @@ class Mur extends Element {
 	
 	constructor(posX,posY,img) {
 		super(posX,posY);
+		this.taille = field.tailleCase;
 		this.img = img;
 	}
 	
@@ -339,10 +340,10 @@ function initBonus() {
             var randomY = Math.floor((Math.random() * field.height));
             switch(bonusType[i]) {
 				case "Sortie" :
-					randomY = 19;
+					randomY = field.height-1;
 					break;
 				case "Bottes" :
-					if(randomY>10) randomY = Math.floor((Math.random() * Math.floor(field.height/2)));
+					if(randomY>Math.floor(field.height/2)) randomY = Math.floor((Math.random() * Math.floor(field.height/2)));
 					 break;
 			}
         } while (isAMur(randomY, randomX));
