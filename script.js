@@ -3,7 +3,7 @@
 // --------- terrain
 var divField;
 var field;
-var tabMur;
+var tabMur = new Array();
 
 // ---------- elements
 var joueur;
@@ -161,7 +161,7 @@ class Joueur extends Element {
 					break;
 			}
 		}
-	}
+	} 
 }
 
 //------------- Bonus
@@ -256,7 +256,6 @@ class Field {
 	}
 	
 	loadMap() {
-		tabMur = [];
 		for(var i=0; i<field.height; i++) {
 			var ligne=[];
 			for(var j=0; j<field.width; j++){
@@ -266,7 +265,7 @@ class Field {
 				else {
 					ligne.push(0);
 					var murImage = document.createElement("img");
-					var mur = new Mur(j,i,murImage);
+					var mur = new Mur(j*field.tailleCase,i*field.tailleCase,murImage);
 					mur.loadImg();
 					tabMur.push(mur);
 					divField.appendChild(mur.img);
@@ -292,8 +291,8 @@ class Mur extends Element {
 		this.img.width = this.taille;
 		this.img.height = this.taille;
 		this.img.style.position="absolute";
-		this.img.style.top=this.taille*this.posX+"px";
-		this.img.style.left=this.taille*this.posY+"px";
+		this.img.style.top=this.posX+"px";
+		this.img.style.left=this.posY+"px";
 		this.img.style.visibility = "visible";
 	}
 }
@@ -467,12 +466,12 @@ function generatePath() {
         do {
             var index = Math.floor((Math.random() * tabMur.length));
             var randomMur = tabMur[index];
-            var tabVoisins = getVoisins(randomMur.posX, randomMur.posY);
+            var tabVoisins = getVoisins(randomMur.getColonne(), randomMur.getLigne());
         } while (tabVoisins.length == 0 || voisinsMemeZone(tabVoisins));
         divField.removeChild(tabMur[index].img);
         tabMur.splice(index, 1);
         var premierVoisin = tabVoisins[Math.floor((Math.random() * tabVoisins.length))];
-        remplirZone(randomMur.posX, randomMur.posY, field.map[premierVoisin[0]][premierVoisin[1]]);
+        remplirZone(randomMur.getColonne(), randomMur.getLigne(), field.map[premierVoisin[0]][premierVoisin[1]]);
     }
 }
 

@@ -13,12 +13,14 @@
 }
 
 #compteur {
-	margin-left : 600px;
+	margin-left : 700px;
 	font-size : 200%;
 }
 
 #score {
+	position : absolute;
 	font-size : 200%;
+	min-width:200px;
 }
 
 
