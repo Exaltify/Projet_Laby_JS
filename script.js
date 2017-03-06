@@ -51,7 +51,7 @@ class Joueur extends Element {
 		super(posX,posY);
 		this.score = 0;
 		this.name = name;
-		this.speed = 4;
+		this.speed = field.tailleCase/10;
 		this.direction = directions[3];
 		this.enMouvement = false;
 	}	
