@@ -2,6 +2,7 @@
 
 // --------- terrain
 var divField;
+var divFenetre;
 var field;
 var tabMur = new Array();
 
@@ -29,7 +30,6 @@ class Element {	// Definition de l'objet
 		this.posX = posX;
 		this.posY = posY;
 		this.taille = field.tailleCase * 0.9;
-
 	}
 	
 	getColonne() {
@@ -38,7 +38,36 @@ class Element {	// Definition de l'objet
 	
 	getLigne() {
 		return Math.floor(this.posY/field.tailleCase);
-	}	
+	}
+
+    getCentreX(){
+        return this.posX+Math.floor(field.tailleCase/2);
+    }
+
+    getCentreY(){
+        return this.posY+Math.floor(field.tailleCase/2);
+    }
+
+    distanceTo(obj){
+        return Math.sqrt(Math.pow(obj.getCentreX()-this.getCentreX(),2)+Math.pow(obj.getCentreY()-this.getCentreY(),2));
+    }
+
+    distanceToCorner(obj,coin){
+        switch(coin) {
+            case '0' :
+                return Math.sqrt(Math.pow(obj.posX-this.getCentreX(),2)+Math.pow(obj.posY-this.getCentreY(),2));
+                break;
+            case '1' :
+                return Math.sqrt(Math.pow(obj.posX+field.tailleCase-this.getCentreX(),2)+Math.pow(obj.posY-this.getCentreY(),2));
+                break;
+            case '2' :
+                return Math.sqrt(Math.pow(obj.posX+field.tailleCase-this.getCentreX(),2)+Math.pow(obj.posY-field.tailleCase-this.getCentreY(),2));
+                break;
+            case '3' :
+                return Math.sqrt(Math.pow(obj.posX-this.getCentreX(),2)+Math.pow(obj.posY-this.getCentreY(),2));
+                break;
+        }
+    }
 }
 
 
@@ -54,7 +83,8 @@ class Joueur extends Element {
 		this.speed = field.tailleCase/10;
 		this.direction = directions[3];
 		this.enMouvement = false;
-	}	
+	}
+
 	
 	deplacerKeyDown(event) {
 		switch(event.keyCode) {
@@ -111,33 +141,32 @@ class Joueur extends Element {
 		if(this.enMouvement) {
 			switch(this.direction) {
 				case 'Droite' : 
-					if((joueur.posX < field.pxWidth - field.tailleCase)&&!collisionMurJoueur())
+					if((joueur.posX < field.pxWidth - field.tailleCase)&&!collisionMurJ())
 						joueur.posX+= joueur.speed;
 					this.img.src="images/joueur/droite/Droite"+cptAnimation+".png";
 					break;
 				case 'Haut' : 
 					if(joueur.posY>0) {
-						if(!collisionMurJoueur()) 
+						if(!collisionMurJ())
 							joueur.posY-= joueur.speed;
-						else
+						/*else
 							if(joueur.posY > (joueur.getLigne()*field.tailleCase))
-								joueur.posY-= joueur.speed;
+								joueur.posY-= joueur.speed;*/
 					}
 					this.img.src="images/joueur/haut/Haut"+cptAnimation+".png";
 					break;
 				case 'Gauche' : 
 					if(joueur.posX>0) {
-						if(!collisionMurJoueur())
+						if(!collisionMurJ())
 							joueur.posX-= joueur.speed;
-						else
+						/*else
 							if(joueur.posX > (joueur.getColonne()*field.tailleCase))
-								joueur.posX-= joueur.speed;
-						
+								joueur.posX-= joueur.speed;*/
 					}
 					this.img.src="images/joueur/gauche/Gauche"+cptAnimation+".png";
 					break;
 				case 'Bas' : 
-					if((joueur.posY< field.pxHeight - field.tailleCase)&&!collisionMurJoueur())
+					if((joueur.posY< field.pxHeight - field.tailleCase)&&!collisionMurJ())
 						joueur.posY+= joueur.speed;
 					this.img.src="images/joueur/bas/Bas"+cptAnimation+".png";
 					break;
@@ -319,9 +348,13 @@ function refresh() {
 
 function initField() {
 	divField = document.getElementById("terrain");
-	field = new Field(800,800,40);
+    divFenetre = document.getElementById("fenetre");
+	field = new Field(400,400,20);
+    document.getElementById("compteur").style.marginLeft= field.pxWidth-Math.floor(field.pxWidth/5)+'px';
 	divField.style.width = field.pxWidth+'px';
 	divField.style.height = field.pxHeight+'px';
+    divFenetre.style.width = field.pxWidth+'px';
+    divFenetre.style.height = field.pxHeight+Math.floor(field.pxHeight/10)+'px';
 	field.loadMap();
 }
 
@@ -399,7 +432,44 @@ function collisionMurJoueur(direction) {
 	return isAMurElement(getProchaineCase());
 }
 
-function getProchaineCase() {
+function collisionMurJ(){
+
+    switch(joueur.direction) {
+        case 'Droite' :
+            if ()
+            break;
+        case 'Haut' :
+    
+            break;
+        case 'Gauche' :
+
+            break;
+        case 'Bas' :
+
+            break;
+    }
+
+    for (var i=0; i<tabMur.length; i++){
+        if (collisionCentreJoueur(tabMur[i]))
+            return true;
+    }
+
+    return false;
+}
+
+function collisionCentreJoueur(obj) {
+    if (joueur.distanceTo(obj)>= field.tailleCase/2 + Math.sqrt(Math.pow(field.tailleCase,2)/2))
+        return false;
+    if (joueur.distanceTo(obj)<= field.tailleCase*2 )
+        return true;
+    if (joueur.distanceToCorner(obj,0)<=field.tailleCase/2||
+        joueur.distanceToCorner(obj,1)<=field.tailleCase/2||
+        joueur.distanceToCorner(obj,2)<=field.tailleCase/2||
+        joueur.distanceToCorner(obj,3)<=field.tailleCase/2)
+        return true
+}
+
+/*function getProchaineCase() {
 	var retour;
 	switch(joueur.direction) {
 		case 'Droite' : 
@@ -424,6 +494,25 @@ function getProchaineCase() {
 			break;
 	}
 	return retour;
+}*/
+
+function getProchaineCase() {
+    var retour;
+    switch(joueur.direction) {
+        case 'Droite' :
+            retour = new Element(joueur.getCentreX()+joueur.taille,joueur.getCentreY());
+            break;
+        case 'Haut' :
+            retour = new Element(joueur.getCentreX(), joueur.getCentreY()-joueur.taille);
+            break;
+        case 'Gauche' :
+            retour = new Element(joueur.getCentreX()-joueur.taille,joueur.getCentreY());
+            break;
+        case 'Bas' :
+            retour = new Element(joueur.getCentreX(), joueur.CentreY()+joueur.taille);
+            break;
+    }
+    return retour;
 }
 
 
