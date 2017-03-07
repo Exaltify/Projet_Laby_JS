@@ -327,6 +327,20 @@ class Mur extends Element {
 }
 // -------------------------------------- Fonctions
 
+function loadMenu() {
+	document.getElementById('terrain').style.visibility = 'hidden';
+	document.getElementById('score').style.visibility = 'hidden';
+	document.getElementById('compteur').style.visibility = 'hidden';
+}
+
+function hideMenu() {
+	document.getElementById('menu').style.display = 'none';
+	document.getElementById('terrain').style.visibility = 'visible';
+	document.getElementById('score').style.visibility = 'visible';
+	document.getElementById('compteur').style.visibility = 'visible';	
+	load();
+}
+
 function load() {
 	echo = document.getElementById('echo'); // à supprimer
 	initField();
@@ -349,7 +363,7 @@ function refresh() {
 function initField() {
 	divField = document.getElementById("terrain");
     divFenetre = document.getElementById("fenetre");
-	field = new Field(400,400,20);
+	field = new Field(600,600,30);
     document.getElementById("compteur").style.marginLeft= field.pxWidth-Math.floor(field.pxWidth/5)+'px';
 	divField.style.width = field.pxWidth+'px';
 	divField.style.height = field.pxHeight+'px';
@@ -436,7 +450,7 @@ function collisionMurJ(){
 
     switch(joueur.direction) {
         case 'Droite' :
-            if ()
+            
             break;
         case 'Haut' :
     
