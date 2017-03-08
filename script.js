@@ -18,8 +18,6 @@ var bonusType = new Array('Tresor','Diamant','Horloge','Bottes','Sortie');
 var duree="60";
 var started=false;
 
-var echo; // à supprimer, c'est pour print sans alert();
-
 
 // ---------------------------------- Classes
 
@@ -33,11 +31,11 @@ class Element {	// Definition de l'objet
 	}
 	
 	getColonne() {
-		return Math.floor(this.posX/field.tailleCase);
+		return Math.floor(this.getCentreX()/field.tailleCase);
 	}
 	
 	getLigne() {
-		return Math.floor(this.posY/field.tailleCase);
+		return Math.floor(this.getCentreY()/field.tailleCase);
 	}
 
     getCentreX(){
@@ -79,7 +77,6 @@ class Joueur extends Element {
 	constructor(posX,posY,name) {
 		super(posX,posY);
 		this.score = 0;
-		this.name = name;
 		this.speed = field.tailleCase/10;
 		this.direction = directions[3];
 		this.enMouvement = false;
@@ -131,8 +128,8 @@ class Joueur extends Element {
 		this.img.height=this.taille;
 		this.img.style.position="absolute";
 		divField.appendChild(this.img);
-		this.img.style.top=this.taille*this.posX+"px";
-		this.img.style.left=this.taille*this.posY+"px";
+		this.img.style.top=this.taille*this.posY+"px";
+		this.img.style.left=this.taille*this.posX+"px";
 		this.img.style.visibility = "visible";
 		joueur.refreshJoueur();
 	}
@@ -141,32 +138,26 @@ class Joueur extends Element {
 		if(this.enMouvement) {
 			switch(this.direction) {
 				case 'Droite' : 
-					if((joueur.posX < field.pxWidth - field.tailleCase)&&!collisionMurJ())
+					if((joueur.posX < field.pxWidth - field.tailleCase)&&!collisionMurJoueur())
 						joueur.posX+= joueur.speed;
 					this.img.src="images/joueur/droite/Droite"+cptAnimation+".png";
 					break;
 				case 'Haut' : 
 					if(joueur.posY>0) {
-						if(!collisionMurJ())
+						if(!collisionMurJoueur())
 							joueur.posY-= joueur.speed;
-						/*else
-							if(joueur.posY > (joueur.getLigne()*field.tailleCase))
-								joueur.posY-= joueur.speed;*/
 					}
 					this.img.src="images/joueur/haut/Haut"+cptAnimation+".png";
 					break;
 				case 'Gauche' : 
 					if(joueur.posX>0) {
-						if(!collisionMurJ())
+						if(!collisionMurJoueur())
 							joueur.posX-= joueur.speed;
-						/*else
-							if(joueur.posX > (joueur.getColonne()*field.tailleCase))
-								joueur.posX-= joueur.speed;*/
 					}
 					this.img.src="images/joueur/gauche/Gauche"+cptAnimation+".png";
 					break;
 				case 'Bas' : 
-					if((joueur.posY< field.pxHeight - field.tailleCase)&&!collisionMurJ())
+					if((joueur.posY< field.pxHeight - field.tailleCase)&&!collisionMurJoueur())
 						joueur.posY+= joueur.speed;
 					this.img.src="images/joueur/bas/Bas"+cptAnimation+".png";
 					break;
@@ -228,13 +219,13 @@ class Bonus extends Element {
 		case 'Diamant' :
             this.img.src="images/diamant.png";
 			break;
-		case 'Horloge' :// à copier
+		case 'Horloge' :
             this.img.src="images/horloge.png";
 			break;
-		case 'Bottes' :// à copier
+		case 'Bottes' :
             this.img.src="images/bottes.png";
 			break;
-		case 'Sortie' :// à copier
+		case 'Sortie' :
             this.img.src="images/sortie.png";
 			break;
 		}
@@ -259,7 +250,7 @@ class Bonus extends Element {
                 joueur.speed *= 2;
                 break;
             case 'Sortie' :
-                alert("C'est gagné !");
+                alert("C'est gagné !");// à modifier vers page win
                 break;
         }
 		var tmp = Array();
@@ -294,7 +285,7 @@ class Field {
 				else {
 					ligne.push(0);
 					var murImage = document.createElement("img");
-					var mur = new Mur(j*field.tailleCase,i*field.tailleCase,murImage);
+					var mur = new Mur(i*field.tailleCase,j*field.tailleCase,murImage);
 					mur.loadImg();
 					tabMur.push(mur);
 					divField.appendChild(mur.img);
@@ -320,8 +311,8 @@ class Mur extends Element {
 		this.img.width = this.taille;
 		this.img.height = this.taille;
 		this.img.style.position="absolute";
-		this.img.style.top=this.posX+"px";
-		this.img.style.left=this.posY+"px";
+		this.img.style.top=this.posY+"px";
+		this.img.style.left=this.posX+"px";
 		this.img.style.visibility = "visible";
 	}
 }
@@ -342,7 +333,6 @@ function hideMenu() {
 }
 
 function load() {
-	echo = document.getElementById('echo'); // à supprimer
 	initField();
 	initJoueur();
 	initBonus();
@@ -363,7 +353,7 @@ function refresh() {
 function initField() {
 	divField = document.getElementById("terrain");
     divFenetre = document.getElementById("fenetre");
-	field = new Field(600,600,30);
+	field = new Field(600,600,20);
     document.getElementById("compteur").style.marginLeft= field.pxWidth-Math.floor(field.pxWidth/5)+'px';
 	divField.style.width = field.pxWidth+'px';
 	divField.style.height = field.pxHeight+'px';
@@ -375,7 +365,7 @@ function initField() {
 function initJoueur() {
     do {
         var randomX = Math.floor((Math.random() * field.width));
-    } while (isAMur(0, randomX));
+    } while (isAMur(randomX,0));
     joueur = new Joueur(randomX*field.tailleCase,0,'Joueur');
     joueur.loadJoueur();
 }
@@ -393,7 +383,7 @@ function initBonus() {
 					if(randomY>Math.floor(field.height/2)) randomY = Math.floor((Math.random() * Math.floor(field.height/2)));
 					 break;
 			}
-        } while (isAMur(randomY, randomX));
+        } while (isAMur(randomX, randomY));
         bonus.push(new Bonus(randomX * field.tailleCase, randomY * field.tailleCase, bonusType[i]));
     }
     for (var i = 0; i < bonus.length; i++)
@@ -442,91 +432,56 @@ function collisionAABB(elem1, elem2, correcteur1, correcteur2) {
     || elem1.posY + Math.floor(elem1.taille*correcteur1) <= elem2.posY);
 }
 
-function collisionMurJoueur(direction) {
-	return isAMurElement(getProchaineCase());
-}
-
-function collisionMurJ(){
+function collisionMurJoueur(){
 
     switch(joueur.direction) {
         case 'Droite' :
-            
+            for (var i=0; i<tabMur.length; i++){
+                if (tabMur[i].getColonne() == joueur.getColonne()+1)
+                    if (collisionCentreJoueur(tabMur[i])){
+                        console.log(tabMur[i].getColonne() +"-"+ tabMur[i].getLigne());
+                        return true;}
+            }
             break;
         case 'Haut' :
-    
+            for (var i=0; i<tabMur.length; i++){
+                if (tabMur[i].getLigne() == joueur.getLigne()-1)
+                    if (collisionCentreJoueur(tabMur[i])){
+                        console.log(tabMur[i].getColonne() +"-"+ tabMur[i].getLigne());
+                        return true;}
+            }
             break;
         case 'Gauche' :
-
+            for (var i=0; i<tabMur.length; i++){
+                if (tabMur[i].getColonne() == joueur.getColonne()-1)
+                    if (collisionCentreJoueur(tabMur[i])){
+                        console.log(tabMur[i].getColonne() +"-"+ tabMur[i].getLigne());
+                        return true;}
+            }
             break;
         case 'Bas' :
-
+            for (var i=0; i<tabMur.length; i++){
+                if (tabMur[i].getLigne() ==  joueur.getLigne()+1)
+                    if (collisionCentreJoueur(tabMur[i])){
+                        console.log(tabMur[i].getColonne() +"-"+ tabMur[i].getLigne());
+                        return true;}
+            }
             break;
     }
-
-    for (var i=0; i<tabMur.length; i++){
-        if (collisionCentreJoueur(tabMur[i]))
-            return true;
-    }
-
     return false;
 }
 
 function collisionCentreJoueur(obj) {
-    if (joueur.distanceTo(obj)>= field.tailleCase/2 + Math.sqrt(Math.pow(field.tailleCase,2)/2))
+    var correctionRayon = field.tailleCase*0.4;
+    if (joueur.distanceTo(obj)>= correctionRayon/2 + Math.sqrt(Math.pow(field.tailleCase,2)/2))
         return false;
-    if (joueur.distanceTo(obj)<= field.tailleCase*2 )
+    if (joueur.distanceTo(obj)<= field.tailleCase+correctionRayon )
         return true;
     if (joueur.distanceToCorner(obj,0)<=field.tailleCase/2||
         joueur.distanceToCorner(obj,1)<=field.tailleCase/2||
         joueur.distanceToCorner(obj,2)<=field.tailleCase/2||
         joueur.distanceToCorner(obj,3)<=field.tailleCase/2)
         return true
-}
-
-/*function getProchaineCase() {
-	var retour;
-	switch(joueur.direction) {
-		case 'Droite' : 
-			retour = new Element(joueur.posX+joueur.taille,joueur.posY);
-			if (retour.posY % field.tailleCase > Math.floor(field.tailleCase / 2))
-				retour.posY += field.tailleCase;
-			break;
-		case 'Haut' : 
-			retour = new Element(joueur.posX, joueur.posY-joueur.taille);
-			if (retour.posX % field.tailleCase > Math.floor(field.tailleCase / 2))
-				retour.posX += field.tailleCase;
-			break;
-		case 'Gauche' :
-			retour = new Element(joueur.posX-joueur.taille,joueur.posY);
-			if (retour.posY % field.tailleCase > Math.floor(field.tailleCase / 2))
-				retour.posY += field.tailleCase;
-			break;
-		case 'Bas' : 
-			retour = new Element(joueur.posX, joueur.posY+joueur.taille);
-			if (retour.posX % field.tailleCase > Math.floor(field.tailleCase / 2))
-				retour.posX += field.tailleCase;
-			break;
-	}
-	return retour;
-}*/
-
-function getProchaineCase() {
-    var retour;
-    switch(joueur.direction) {
-        case 'Droite' :
-            retour = new Element(joueur.getCentreX()+joueur.taille,joueur.getCentreY());
-            break;
-        case 'Haut' :
-            retour = new Element(joueur.getCentreX(), joueur.getCentreY()-joueur.taille);
-            break;
-        case 'Gauche' :
-            retour = new Element(joueur.getCentreX()-joueur.taille,joueur.getCentreY());
-            break;
-        case 'Bas' :
-            retour = new Element(joueur.getCentreX(), joueur.CentreY()+joueur.taille);
-            break;
-    }
-    return retour;
 }
 
 
@@ -538,7 +493,7 @@ function timer()
     var s=duree;
     var m = 0;
     if(s<0)
-        compteur.innerHTML="Perdu !"
+        compteur.innerHTML="Perdu !"// à modifier vers page lose
     else
     {
         if(s>59)
