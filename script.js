@@ -500,13 +500,13 @@ function loadEnding(param) {
 			document.getElementById('boutonFastRestart').style.top = 250+'px';
 			document.getElementById('boutonRetourMenu').style.top = 250+'px';
 			document.getElementById('endingScore').innerHTML = joueur.score + parseInt(duree)*100;
+			document.getElementById('endingScore').style.visibility = 'visible';
             break;
     }
     document.getElementById('fenetre').style.height = 640+'px';
     document.getElementById('endingScreen').style.visibility = 'visible';
     document.getElementById('boutonFastRestart').style.visibility = 'visible';
-    document.getElementById('boutonRetourMenu').style.visibility = 'visible';
-	document.getElementById('endingScore').style.visibility = 'visible';
+    document.getElementById('boutonRetourMenu').style.visibility = 'visible';	
     resetGame();
 }
 
@@ -618,12 +618,13 @@ function resetGame() {
     fog = null;
     tabFog = new Array();
     bonus = new Array();
+	bonusType = new Array('Tresor','Diamant','Horloge','Bottes','Sortie');
     tabMur = new Array();
     duree = "60";
     if (optionTaille == 20)
         duree = "120";
     started = false;
-    compteur.innerHTML = "01:00";
+    compteur.innerHTML = "Prêt ?";
 }
 
 function isAMur(i, j) {
