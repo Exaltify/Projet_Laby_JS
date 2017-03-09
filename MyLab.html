@@ -10,15 +10,22 @@
 <div id="fenetre">
 	<div id="menu">
 		<div id='boutonOptions'>
+			<div id='sizeSmall' onclick ="sizeSmall();"></div>
+			<div id ='sizeLarge' onclick="sizeLarge();"></div>
+			<div id ='fogOn' onclick="fogOn();"></div>
+			<div id='fogOff' onclick="fogOff();"></div>
 		</div>
-		<div onclick = "hideMenu();" id='boutonCommencer'>
+		<div  onclick = "loadGame();" id='boutonCommencer'>
 		</div>
 	</div>
 	<div id="terrain">
 	</div>
+	<div id="endingScreen">
+		<div onclick="loadGame();" id='boutonFastRestart'></div>
+		<div onclick="loadMenu();" id='boutonRetourMenu'></div>
+	</div>
 	<span id="score">Score : 0</span>
 	<span id="compteur">Prêt ?<span> 
 </div>
-<div id="echo"></div>
 </body>
 </html>

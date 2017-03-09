@@ -1,19 +1,27 @@
+body {
+	overflow:hidden;
+}
+
 #fenetre {
 	border : 3px solid black;
 	width : 600px;
 	height : 640px;
 	margin : auto;
+	position : relative;
 }
 
 #terrain {
 	border : 1px solid black;
-	position : relative;
+	position : absolute;
 	visibility : hidden;
 }
 
 #compteur {
+	position : absolute;
 	font-size : 200%;
 	visibility : hidden;
+	top : 610px;
+	left : 500px;
 }
 
 #score {
@@ -21,6 +29,8 @@
 	font-size : 200%;
 	min-width:200px;
 	visibility : hidden;
+	top : 610px;
+	left : 25px;
 }
 
 #menu {
@@ -38,7 +48,7 @@
 	visibility : visible;
 	min-width:450px;
 	min-height:200px;
-	background-image: url(images/boutonOptions.png);
+	background-image: url(images/boutons/boutonOptions.png);
 }
 
 #boutonCommencer {
@@ -48,5 +58,80 @@
 	visibility : visible;
 	min-width:450px;
 	min-height:121px;
-	background-image: url(images/boutonCommencer.png);
+	background-image: url(images/boutons/boutonCommencer.png);
+	cursor: pointer; cursor: hand
+}
+
+#sizeSmall {
+	position : absolute;
+	top : 45px;
+	left : 365px;
+	visibility : visible;
+	min-width:30px;
+	min-height:30px;
+	background-image: url(images/boutons/checked.png);
+	cursor: pointer; cursor: hand
+}
+
+#sizeLarge {
+	position : absolute;
+	top : 45px;
+	left : 270px;
+	visibility : visible;
+	min-width:30px;
+	min-height:30px;
+	background-image: url(images/boutons/unchecked.png);
+	cursor: pointer; cursor: hand
+}
+
+#fogOn {
+	position : absolute;
+	top : 117px;
+	left : 293px;
+	visibility : visible;
+	min-width:30px;
+	min-height:30px;
+	background-image: url(images/boutons/checked.png);
+	cursor: pointer; cursor: hand
+}
+
+#fogOff {
+	position : absolute;
+	top : 117px;
+	left : 370px;
+	visibility : visible;
+	min-width:30px;
+	min-height:30px;
+	background-image: url(images/boutons/unchecked.png);
+	cursor: pointer; cursor: hand
+}
+
+#endingScreen {
+	position : absolute;
+	visibility : hidden;
+	min-width:600px;
+	min-height:640px;
+	background-image: url(images/endingLose.png);
+}
+
+#boutonFastRestart {
+	position : absolute;
+	top : 130px;
+	left : 15px;
+	visibility : hidden;
+	min-width:250px;
+	min-height:67px;
+	background-image: url(images/boutons/boutonfastRestart.png);
+	cursor: pointer; cursor: hand	
+}
+
+#boutonRetourMenu {
+	position : absolute;
+	top : 130px;
+	left : 330px;
+	visibility : hidden;
+	min-width:250px;
+	min-height:67px;
+	background-image: url(images/boutons/boutonretourMenu.png);	
+	cursor: pointer; cursor: hand
 }

@@ -1,8 +1,15 @@
 // ----------------------------- Variables globales
 
+var timeOutRefresh;
+var timeOutChrono;
+
+var gameLoaded = false;
+
 // --------- terrain
 var divField;
 var divFenetre;
+var optionTaille = 30;
+var optionFog = true;
 var field;
 var tabMur = new Array();
 
@@ -214,19 +221,19 @@ class Bonus extends Element {
 	    this.img= document.createElement("img");
 		switch(this.type) {
 		case 'Tresor' :
-            this.img.src="images/tresor.png";
+            this.img.src="images/elements/tresor.png";
 			break;
 		case 'Diamant' :
-            this.img.src="images/diamant.png";
+            this.img.src="images/elements/diamant.png";
 			break;
 		case 'Horloge' :
-            this.img.src="images/horloge.png";
+            this.img.src="images/elements/horloge.png";
 			break;
 		case 'Bottes' :
-            this.img.src="images/bottes.png";
+            this.img.src="images/elements/bottes.png";
 			break;
 		case 'Sortie' :
-            this.img.src="images/sortie.png";
+            this.img.src="images/elements/sortie.png";
 			break;
 		}
         this.img.width=this.taille;
@@ -250,7 +257,7 @@ class Bonus extends Element {
                 joueur.speed *= 2;
                 break;
             case 'Sortie' :
-                alert("C'est gagné !");// à modifier vers page win
+                loadEnding(1);
                 break;
         }
 		var tmp = Array();
@@ -307,7 +314,7 @@ class Mur extends Element {
 	}
 	
 	loadImg() {
-		this.img.src = "images/mur.png";
+		this.img.src = "images/elements/mur.png";
 		this.img.width = this.taille;
 		this.img.height = this.taille;
 		this.img.style.position="absolute";
@@ -316,45 +323,118 @@ class Mur extends Element {
 		this.img.style.visibility = "visible";
 	}
 }
+// -------------------------------------- Options
+
+function sizeSmall() {
+	optionTaille = 30;
+	document.getElementById('sizeSmall').style.backgroundImage = "url('images/boutons/checked.png')";
+	document.getElementById('sizeLarge').style.backgroundImage = "url('images/boutons/unchecked.png')";
+}
+
+function sizeLarge() {
+	optionTaille = 20;
+	document.getElementById('sizeSmall').style.backgroundImage = "url('images/boutons/unchecked.png')";
+	document.getElementById('sizeLarge').style.backgroundImage = "url('images/boutons/checked.png')";
+}
+
+function fogOn() {
+	optionFog = true;
+	document.getElementById('fogOff').style.backgroundImage = "url('images/boutons/unchecked.png')";
+	document.getElementById('fogOn').style.backgroundImage = "url('images/boutons/checked.png')";	
+}
+
+function fogOff() {
+	optionFog = false;
+	document.getElementById('fogOn').style.backgroundImage = "url('images/boutons/unchecked.png')";
+	document.getElementById('fogOff').style.backgroundImage = "url('images/boutons/checked.png')";	
+}
+
 // -------------------------------------- Fonctions
 
+// Initialisation et rafraichissement
+
 function loadMenu() {
-	document.getElementById('terrain').style.visibility = 'hidden';
-	document.getElementById('score').style.visibility = 'hidden';
-	document.getElementById('compteur').style.visibility = 'hidden';
+	hideEnding();
+	document.getElementById('menu').style.visibility = 'visible';
+	document.getElementById('boutonOptions').style.visibility = 'visible';
+	document.getElementById('sizeSmall').style.visibility = 'visible';
+	document.getElementById('sizeLarge').style.visibility = 'visible';
+	document.getElementById('boutonCommencer').style.visibility = 'visible';
+	document.getElementById('fogOn').style.visibility = 'visible';
+	document.getElementById('fogOff').style.visibility = 'visible';
+	document.getElementById('fenetre').style.height = 640+'px';
 }
 
 function hideMenu() {
-	document.getElementById('menu').style.display = 'none';
-	document.getElementById('terrain').style.visibility = 'visible';
-	document.getElementById('score').style.visibility = 'visible';
-	document.getElementById('compteur').style.visibility = 'visible';	
-	load();
+	document.getElementById('menu').style.visibility = 'hidden';
+	document.getElementById('boutonOptions').style.visibility = 'hidden';
+	document.getElementById('sizeSmall').style.visibility = 'hidden';
+	document.getElementById('sizeLarge').style.visibility = 'hidden';
+	document.getElementById('boutonCommencer').style.visibility = 'hidden';
+	document.getElementById('fogOn').style.visibility = 'hidden';
+	document.getElementById('fogOff').style.visibility = 'hidden';
 }
 
-function load() {
+function loadGame() {
+	hideMenu();
+	hideEnding();
 	initField();
 	initJoueur();
 	initBonus();
-	initEventListener();	
+	initEventListener();
+	document.getElementById('terrain').style.visibility = 'visible';
+	document.getElementById('score').style.visibility = 'visible';
+	document.getElementById('compteur').style.visibility = 'visible';
+	gameLoaded = true;
 	refresh();
 }
 
-function refresh() {
-	joueur.refreshJoueur();
-	for(var i=0;i<bonus.length;i++) {
-		if(collisionAABB(joueur,bonus[i],0.75,1))
-			bonus[i].ramasser();
+function hideGame() {
+	document.getElementById('terrain').style.visibility = 'hidden';
+	document.getElementById('score').style.visibility = 'hidden';
+	document.getElementById('compteur').style.visibility = 'hidden';	
+}
+
+function loadEnding(type) {
+	gameLoaded = false;
+	hideGame();
+	switch(type) {
+		case 0 : 	// Defaite
+			document.getElementById('endingScreen').backgroundImage = "url('images/endingLose.png')";
+			break;
+		case 1 : 	// Victoire
+			document.getElementById('endingScreen').backgroundImage = "url('images/endingLose.png')";
+			break;		
 	}
-	refreshScore();
-	setTimeout(refresh,1000/30);
+	document.getElementById('fenetre').style.height = 640+'px';
+	document.getElementById('endingScreen').style.visibility = 'visible';
+	document.getElementById('boutonFastRestart').style.visibility = 'visible';
+	document.getElementById('boutonRetourMenu').style.visibility = 'visible';
+	resetGame();
+}
+
+function hideEnding() {
+	document.getElementById('endingScreen').style.visibility = 'hidden';
+	document.getElementById('boutonFastRestart').style.visibility = 'hidden';
+	document.getElementById('boutonRetourMenu').style.visibility = 'hidden';
+}
+
+function refresh() {
+	if(gameLoaded) {
+		joueur.refreshJoueur();
+		for(var i=0;i<bonus.length;i++) {
+			if(collisionAABB(joueur,bonus[i],0.75,1))
+				bonus[i].ramasser();
+		}
+		refreshScore();
+	}
+	timeOutRefresh = setTimeout(refresh,1000/30);
 }
 
 function initField() {
 	divField = document.getElementById("terrain");
     divFenetre = document.getElementById("fenetre");
-	field = new Field(600,600,20);
-    document.getElementById("compteur").style.marginLeft= field.pxWidth-Math.floor(field.pxWidth/5)+'px';
+	field = new Field(600,600,optionTaille);
 	divField.style.width = field.pxWidth+'px';
 	divField.style.height = field.pxHeight+'px';
     divFenetre.style.width = field.pxWidth+'px';
@@ -383,7 +463,7 @@ function initBonus() {
 					if(randomY>Math.floor(field.height/2)) randomY = Math.floor((Math.random() * Math.floor(field.height/2)));
 					 break;
 			}
-        } while (isAMur(randomX, randomY));
+        } while (isAMur(randomX, randomY)&&(randomX!=joueur.getLigne()||randomY!=joueur.getColonne()));
         bonus.push(new Bonus(randomX * field.tailleCase, randomY * field.tailleCase, bonusType[i]));
     }
     for (var i = 0; i < bonus.length; i++)
@@ -396,31 +476,36 @@ function initEventListener() {
 }
 
 function refreshScore() {
-	document.getElementById("score").innerHTML = "Score : "+joueur.score;
+	if(gameLoaded)
+		document.getElementById("score").innerHTML = "Score : "+joueur.score;
+	
 }
 
-function isAMurElement(elem) {
-	var i = normalizeLigne(elem.getLigne());
-	var j = normalizeColonne(elem.getColonne());
-	return isAMur(i,j);
+// ---------------- autres fonctions
+
+function resetGame() {
+	clearTimeout(timeOutRefresh);
+    clearTimeout(timeOutChrono);
+	document.getElementById('container').removeEventListener("keydown",joueur.deplacerKeyDown);
+	document.getElementById('container').removeEventListener("keyup",joueur.deplacerKeyUp);
+	for(var i=0;i<tabMur.length;i++) {
+		divField.removeChild(tabMur[i].img);
+	}
+	for(var i=0;i<bonus.length;i++) {
+		divField.removeChild(bonus[i].img);
+	}
+	divField.removeChild(joueur.img);
+	field = null;
+	joueur = null;
+	bonus = new Array();
+	tabMur = new Array();
+	duree = "60";
+	started = false;
+	compteur.innerHTML="01:00";
 }
 
 function isAMur(i,j) {
     return (field.map[i][j]==0);
-}
-
-function normalizeColonne(unsafeX) {
-	retour = unsafeX;
-	if(retour < 0) retour = 0;
-	if(retour > field.width - 1) retour = field.width - 1;
-	return retour;
-}
-
-function normalizeLigne(unsafeY) {
-	retour = unsafeY;
-	if(retour < 0) retour = 0;
-	if(retour > field.height - 1) retour = field.height - 1;
-	return retour;
 }
 
 // --------- Collision
@@ -438,33 +523,29 @@ function collisionMurJoueur(){
         case 'Droite' :
             for (var i=0; i<tabMur.length; i++){
                 if (tabMur[i].getColonne() == joueur.getColonne()+1)
-                    if (collisionCentreJoueur(tabMur[i])){
-                        console.log(tabMur[i].getColonne() +"-"+ tabMur[i].getLigne());
-                        return true;}
+                    if (collisionCentreJoueur(tabMur[i]))                        
+                        return true;
             }
             break;
         case 'Haut' :
             for (var i=0; i<tabMur.length; i++){
                 if (tabMur[i].getLigne() == joueur.getLigne()-1)
-                    if (collisionCentreJoueur(tabMur[i])){
-                        console.log(tabMur[i].getColonne() +"-"+ tabMur[i].getLigne());
-                        return true;}
+                    if (collisionCentreJoueur(tabMur[i]))                        
+                        return true;
             }
             break;
         case 'Gauche' :
             for (var i=0; i<tabMur.length; i++){
                 if (tabMur[i].getColonne() == joueur.getColonne()-1)
-                    if (collisionCentreJoueur(tabMur[i])){
-                        console.log(tabMur[i].getColonne() +"-"+ tabMur[i].getLigne());
-                        return true;}
+                    if (collisionCentreJoueur(tabMur[i]))                        
+                        return true;
             }
             break;
         case 'Bas' :
             for (var i=0; i<tabMur.length; i++){
                 if (tabMur[i].getLigne() ==  joueur.getLigne()+1)
-                    if (collisionCentreJoueur(tabMur[i])){
-                        console.log(tabMur[i].getColonne() +"-"+ tabMur[i].getLigne());
-                        return true;}
+                    if (collisionCentreJoueur(tabMur[i]))                        
+                        return true;
             }
             break;
     }
@@ -489,31 +570,32 @@ function collisionCentreJoueur(obj) {
 
 function timer()
 {
-    var compteur=document.getElementById('compteur');
-    var s=duree;
-    var m = 0;
-    if(s<0)
-        compteur.innerHTML="Perdu !"// à modifier vers page lose
-    else
-    {
-        if(s>59)
-        {
-            m=Math.floor(s/60);
-            s=s-m*60
-        }
-        if(s<10)
-        {
-            s="0"+s
-        }
-        if(m<10)
-        {
-            m="0"+m
-        }
-        compteur.innerHTML=m+":"+s
-    }
-    duree=duree-1;
-    setTimeout("timer();",999);
-
+	if(gameLoaded) {
+		var compteur=document.getElementById('compteur');
+		var s=duree;
+		var m = 0;
+		if(s<0)
+			loadEnding(0);
+		else
+		{
+			if(s>59)
+			{
+				m=Math.floor(s/60);
+				s=s-m*60
+			}
+			if(s<10)
+			{
+				s="0"+s
+			}
+			if(m<10)
+			{
+				m="0"+m
+			}
+			compteur.innerHTML=m+":"+s
+		}
+		duree=duree-1;
+	}
+    timeOutChrono = setTimeout("timer();",999);
 }
 
 //--------------------------------Generation Labyrinthe--------------------------------//
