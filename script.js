@@ -594,8 +594,8 @@ function resetGame() {
     for (var i = 0; i < bonus.length; i++) {
         divField.removeChild(bonus[i].img);
     }
-    for (var i = 0; i < tabFog.length; i++) {
-        for (var j = O; j < tabFog[0].length; j++) {
+    for (var i=0; i < tabFog.length; i++) {
+        for (var j=0; j < tabFog[0].length; j++) {
             divField.removeChild(tabFog[i][j].img);
         }
     }
