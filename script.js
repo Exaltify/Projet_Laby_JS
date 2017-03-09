@@ -706,8 +706,9 @@ function timer() {
             compteur.innerHTML = m + ":" + s
         }
         duree = duree - 1;
+		timeOutChrono = setTimeout("timer();", 999);
     }
-    timeOutChrono = setTimeout("timer();", 999);
+
 }
 
 //--------------------------------Generation Labyrinthe--------------------------------//
