@@ -64,8 +64,8 @@ body {
 
 #sizeSmall {
 	position : absolute;
-	top : 45px;
-	left : 365px;
+	top : 53px;
+	left : 355px;
 	visibility : visible;
 	min-width:30px;
 	min-height:30px;
@@ -75,8 +75,8 @@ body {
 
 #sizeLarge {
 	position : absolute;
-	top : 45px;
-	left : 270px;
+	top : 53px;
+	left : 260px;
 	visibility : visible;
 	min-width:30px;
 	min-height:30px;
@@ -87,7 +87,7 @@ body {
 #fogOn {
 	position : absolute;
 	top : 117px;
-	left : 293px;
+	left : 283px;
 	visibility : visible;
 	min-width:30px;
 	min-height:30px;
@@ -98,7 +98,7 @@ body {
 #fogOff {
 	position : absolute;
 	top : 117px;
-	left : 370px;
+	left : 380px;
 	visibility : visible;
 	min-width:30px;
 	min-height:30px;
@@ -122,7 +122,7 @@ body {
 	min-width:250px;
 	min-height:67px;
 	background-image: url(images/boutons/boutonfastRestart.png);
-	cursor: pointer; cursor: hand	
+	cursor: pointer; cursor: hand
 }
 
 #boutonRetourMenu {
@@ -132,6 +132,6 @@ body {
 	visibility : hidden;
 	min-width:250px;
 	min-height:67px;
-	background-image: url(images/boutons/boutonretourMenu.png);	
+	background-image: url(images/boutons/boutonretourMenu.png);
 	cursor: pointer; cursor: hand
 }
