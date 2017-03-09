@@ -28,6 +28,8 @@ var duree="60";
 var started=false;
 
 
+
+
 // ---------------------------------- Classes
 
 
@@ -517,8 +519,8 @@ function refresh() {
                 bonus[i].ramasser();
         }
         refreshScore();
+        timeOutRefresh = setTimeout(refresh,1000/30);
     }
-    timeOutRefresh = setTimeout(refresh,1000/30);
 }
 
 function initField() {
@@ -532,11 +534,16 @@ function initField() {
     field.loadMap();
 }
 
+function Carte(param){
+    return param == "Carte";
+}
+
 function initFog(){
     if (optionFog){
         fog = new Fog();
         fog.loadFog();
-        bonusType.push('Carte');
+        if (bonusType.find(Carte) == undefined)
+            bonusType.push('Carte');
     }
 }
 
