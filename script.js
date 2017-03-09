@@ -607,7 +607,7 @@ function generatePath() {
             var index = Math.floor((Math.random() * tabMur.length));
             var randomMur = tabMur[index];
             var tabVoisins = getVoisins(randomMur.getColonne(), randomMur.getLigne());
-        } while (tabVoisins.length == 0 || voisinsMemeZone(tabVoisins));
+        } while (tabVoisins.length == 0 || memeVoisins(tabVoisins));
         divField.removeChild(tabMur[index].img);
         tabMur.splice(index, 1);
         var premierVoisin = tabVoisins[Math.floor((Math.random() * tabVoisins.length))];
@@ -624,7 +624,7 @@ function getVoisins(i, j) {
     return tabVoisins;
 }
 
-function voisinsMemeZone(tabVoisins) {
+function memeVoisins(tabVoisins) {
     var valueTab = [];
     if(tabVoisins.length<2) {return false;}
     valueTab.push(field.map[tabVoisins[0][0]][tabVoisins[0][1]]);
