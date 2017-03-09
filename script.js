@@ -1,13 +1,12 @@
 // ----------------------------- Variables globales
 
-var timeOutRefresh;
-var timeOutChrono;
+var timeOutRefresh, timeOutChrono;			// id des setTimeOut
 
 var gameLoaded = false;
 
 // --------- terrain
-var divField;
-var divFenetre;
+var divField;								
+var divFenetre;			
 var optionTaille = 30;
 var optionFog = true;
 var field;
@@ -48,11 +47,11 @@ class Element {	// Definition de l'objet
         return Math.floor(this.getCentreY()/field.tailleCase);
     }
 
-    getCentreX(){
-        return this.posX+Math.floor(field.tailleCase/2);
+    getCentreX(){		// retourne la position en abscisse du centre (en pixels)
+        return this.posX+Math.floor(field.tailleCase/2);				
     }
 
-    getCentreY(){
+    getCentreY(){	// retourne la position en ordonnée du centre (en pixels)
         return this.posY+Math.floor(field.tailleCase/2);
     }
 
@@ -60,18 +59,18 @@ class Element {	// Definition de l'objet
         return Math.sqrt(Math.pow(obj.getCentreX()-this.getCentreX(),2)+Math.pow(obj.getCentreY()-this.getCentreY(),2));
     }
 
-    distanceToCorner(obj,coin){
+    distanceToCorner(obj,coin){				// distance a un coin de obj
         switch(coin) {
-            case '0' :
-                return Math.sqrt(Math.pow(obj.posX-this.getCentreX(),2)+Math.pow(obj.posY-this.getCentreY(),2));
+            case '0' :	// coin haut gauche
+                return Math.sqrt(Math.pow(obj.posX-this.getCentreX(),2)+Math.pow(obj.posY-this.getCentreY(),2));			
                 break;
-            case '1' :
+            case '1' :	// coin haut droite
                 return Math.sqrt(Math.pow(obj.posX+field.tailleCase-this.getCentreX(),2)+Math.pow(obj.posY-this.getCentreY(),2));
                 break;
-            case '2' :
+            case '2' :	// coin bas droite
                 return Math.sqrt(Math.pow(obj.posX+field.tailleCase-this.getCentreX(),2)+Math.pow(obj.posY-field.tailleCase-this.getCentreY(),2));
                 break;
-            case '3' :
+            case '3' :	// coin bas gauche
                 return Math.sqrt(Math.pow(obj.posX-this.getCentreX(),2)+Math.pow(obj.posY-this.getCentreY(),2));
                 break;
         }
@@ -298,11 +297,11 @@ class Field {
     }
 
     loadMap() {
-        for(var i=0; i<field.height; i++) {
+        for(var i=0; i<field.height; i++) {				// On génère la matrice map[][] avec un entier unique lorsque les deux indices sont impairs, et des 0 pour le reste
             var ligne=[];
             for(var j=0; j<field.width; j++){
                 if(i%2==1 && j%2==1) {
-                    ligne.push(i*field.width+j+1);
+                    ligne.push(i*field.width+j+1);	// (i*field.width+j+1) => la valeur de cet entier n'est pas significative, elle doit juste être unique dans la matrice map
                 }
                 else {
                     ligne.push(0);
@@ -366,7 +365,7 @@ class Fog {
     }
 
 
-    revelationCentree(elem,radius){
+    revelationCentree(elem,radius){				
         var a=elem.getColonne()+radius+1;
         var b=elem.getColonne()-radius;
         var c=elem.getLigne()+radius+1;
@@ -540,7 +539,7 @@ function initField() {
     field.loadMap();
 }
 
-function Carte(param){
+function Carte(param){				// utilisée comme paramètre pour appeller array.find
     return param == "Carte";
 }
 
@@ -556,7 +555,7 @@ function initFog(){
 function initJoueur() {
     do {
         var randomX = Math.floor((Math.random() * field.width));
-    } while (isAMur(randomX,0));
+    } while (isAMur(randomX,0));									// On place le joueur sur la première ligne
     joueur = new Joueur(randomX*field.tailleCase,0,'Joueur');
     joueur.loadJoueur();
     if(optionFog) fog.revelationCentree(joueur,2);
@@ -569,10 +568,10 @@ function initBonus() {
             var randomY = Math.floor((Math.random() * field.height));
             switch(bonusType[i]) {
                 case "Sortie" :
-                    randomY = field.height-1;
+                    randomY = field.height-1;							// La sortie se place sur la dernière ligne
                     break;
                 case "Bottes" :
-                    if(randomY>Math.floor(field.height/2)) randomY = Math.floor((Math.random() * Math.floor(field.height/2)));
+                    if(randomY>Math.floor(field.height/2)) randomY = Math.floor((Math.random() * Math.floor(field.height/2)));		// les bottes se placent dans la moitié du terrain la plus haute
                     break;
             }
         } while (isAMur(randomX, randomY)&&(randomX!=joueur.getColonne()||randomY!=joueur.getLigne()));
@@ -602,10 +601,10 @@ function resetGame() {
     document.getElementById('container').removeEventListener("keydown", joueur.deplacerKeyDown);
     document.getElementById('container').removeEventListener("keyup", joueur.deplacerKeyUp);
     for (var i = 0; i < tabMur.length; i++) {
-        divField.removeChild(tabMur[i].img);
+        divField.removeChild(tabMur[i].img);				// On supprime toutes les images des murs, des bonus, du joueur et du brouillard dans le <div>
     }
     for (var i = 0; i < bonus.length; i++) {
-        divField.removeChild(bonus[i].img);
+        divField.removeChild(bonus[i].img);					
     }
     for (var i=0; i < tabFog.length; i++) {
         for (var j=0; j < tabFog[0].length; j++) {
@@ -613,7 +612,7 @@ function resetGame() {
         }
     }
     divField.removeChild(joueur.img);
-    field = null;
+    field = null;							// On réinitialise les variables à leur valeurs originales
     joueur = null;
     fog = null;
     tabFog = new Array();
@@ -634,7 +633,7 @@ function isAMur(i, j) {
 
 // --------- Collision
 
-function collisionAABB(elem1, elem2, correcteur1, correcteur2) {
+function collisionAABB(elem1, elem2, correcteur1, correcteur2) {					// Collision entre deux rectangles
     return !(elem1.posX >= elem2.posX + Math.floor(elem2.taille * correcteur2)
     || elem1.posX + Math.floor(elem1.taille * correcteur1) <= elem2.posX
     || elem1.posY >= elem2.posY + Math.floor(elem2.taille * correcteur2)
@@ -676,13 +675,13 @@ function collisionMurJoueur() {
     return false;
 }
 
-function collisionCentreJoueur(obj) {
+function collisionCentreJoueur(obj) {														// retourne vraie si collision entre le cercle inscrit du joueur et le carré obj
     var correctionRayon = field.tailleCase * 0.4;
-    if (joueur.distanceTo(obj) >= correctionRayon / 2 + Math.sqrt(Math.pow(field.tailleCase, 2) / 2))
+    if (joueur.distanceTo(obj) >= correctionRayon / 2 + Math.sqrt(Math.pow(field.tailleCase, 2) / 2))		// on teste la collision entre le cercle inscrit du joueur et le cercle circonscrit du carré
         return false;
-    if (joueur.distanceTo(obj) <= field.tailleCase + correctionRayon)
+    if (joueur.distanceTo(obj) <= field.tailleCase + correctionRayon)		// puis entre le cercle inscrit du joueur et le cercle inscrit du carré
         return true;
-    if (joueur.distanceToCorner(obj, 0) <= field.tailleCase / 2 ||
+    if (joueur.distanceToCorner(obj, 0) <= field.tailleCase / 2 ||		// enfin entre le cercle inscrit du joueur et chaque coin du carré
         joueur.distanceToCorner(obj, 1) <= field.tailleCase / 2 ||
         joueur.distanceToCorner(obj, 2) <= field.tailleCase / 2 ||
         joueur.distanceToCorner(obj, 3) <= field.tailleCase / 2)
@@ -722,20 +721,20 @@ function timer() {
 
 
 function generatePath() {
-    while (!labyParfait()) {
+    while (!labyParfait()) {			// Tant que toutes les valeurs non nulles de map[][] ne sont pas les mêmes
         do {
-            var index = Math.floor((Math.random() * tabMur.length));
+            var index = Math.floor((Math.random() * tabMur.length));		// on choisit un mur au hasard
             var randomMur = tabMur[index];
-            var tabVoisins = getVoisins(randomMur.getColonne(), randomMur.getLigne());
-        } while (tabVoisins.length == 0 || memeVoisins(tabVoisins));
-        divField.removeChild(tabMur[index].img);
+            var tabVoisins = getVoisins(randomMur.getColonne(), randomMur.getLigne());			// On récupère les voisins ayant une valeur non nulle
+        } while (tabVoisins.length == 0 || memeVoisins(tabVoisins));		// Tant qu'il n'y a pas de voisins ou que tous les voisins ont la même valeur
+        divField.removeChild(tabMur[index].img);							// On supprime le mur (pour creer un chemin)
         tabMur.splice(index, 1);
-        var premierVoisin = tabVoisins[Math.floor((Math.random() * tabVoisins.length))];
-        remplirZone(randomMur.getColonne(), randomMur.getLigne(), field.map[premierVoisin[0]][premierVoisin[1]]);
+        var premierVoisin = tabVoisins[Math.floor((Math.random() * tabVoisins.length))];				// on choisit un voisin aléatoirement
+        remplirZone(randomMur.getColonne(), randomMur.getLigne(), field.map[premierVoisin[0]][premierVoisin[1]]);	// On change récursivement la valeur de tous les voisins en celle du premier voisin
     }
 }
 
-function getVoisins(i, j) {
+function getVoisins(i, j) {		// retourne tous les voisins (dans la matrice map) ayant une valeur non nulle 
     tabVoisins = [];
     if (j > 0 && field.map[i][j - 1] != 0) tabVoisins.push([i, j - 1]); //voisin gauche
     if (j < field.width - 1 && field.map[i][j + 1] != 0) tabVoisins.push([i, j + 1]); //voisin droit
@@ -762,22 +761,22 @@ function memeVoisins(tabVoisins) {
 }
 
 function remplirZone(i, j, value) {
-    if (field.map[i][j] != value) {
-        var tabVoisins = getVoisins(i, j);
-        field.map[i][j] = value;
+    if (field.map[i][j] != value) {					// condition d'arret de la fonction récursive, n'est plus vérifiée lorsque toute la zone est remplie
+        var tabVoisins = getVoisins(i, j);			
+        field.map[i][j] = value;				
         if (tabVoisins.length != 0) {
-            for (var k = 0, count = tabVoisins.length; k < count; k++) {
-                remplirZone(tabVoisins[k][0], tabVoisins[k][1], value);
+            for (var k = 0; k < tabVoisins.length; k++) {
+                remplirZone(tabVoisins[k][0], tabVoisins[k][1], value);			// On mets récursivement tous les voisins à la même valeur
             }
         }
     }
 }
 
-function labyParfait() {
+function labyParfait() {			// retourne true si toutes les valeurs non nulles de map[][] sont identiques
         var value = field.map[1][1];
         for (var i = 0; i < field.height; i++) {
             for (var j = 0; j < field.width; j++) {
-                if (field.map[i][j] != value && field.map[i][j] != 0) {
+                if (field.map[i][j] != value && field.map[i][j] != 0) {	
                     return false;
                 }
             }
