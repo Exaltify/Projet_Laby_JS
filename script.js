@@ -29,7 +29,6 @@ var started=false;
 
 
 
-
 // ---------------------------------- Classes
 
 
@@ -487,21 +486,27 @@ function hideGame() {
     document.getElementById('compteur').style.visibility = 'hidden';
 }
 
-function loadEnding(type) {
+function loadEnding(param) {
     gameLoaded = false;
     hideGame();
-    switch(type) {
+    switch(param) {
         case 0 : 	// Defaite
-            document.getElementById('endingScreen').backgroundImage = "url('images/endingLose.png')";
+            document.getElementById('endingScreen').style.backgroundImage = "url('images/endingLose.png')";
+			document.getElementById('boutonFastRestart').style.top = 130+'px';
+			document.getElementById('boutonRetourMenu').style.top = 130+'px';
             break;
         case 1 : 	// Victoire
-            document.getElementById('endingScreen').backgroundImage = "url('images/endingLose.png')";
+            document.getElementById('endingScreen').style.backgroundImage = "url('images/endingWin.png')";
+			document.getElementById('boutonFastRestart').style.top = 250+'px';
+			document.getElementById('boutonRetourMenu').style.top = 250+'px';
+			document.getElementById('endingScore').innerHTML = joueur.score + parseInt(duree)*100;
             break;
     }
     document.getElementById('fenetre').style.height = 640+'px';
     document.getElementById('endingScreen').style.visibility = 'visible';
     document.getElementById('boutonFastRestart').style.visibility = 'visible';
     document.getElementById('boutonRetourMenu').style.visibility = 'visible';
+	document.getElementById('endingScore').style.visibility = 'visible';
     resetGame();
 }
 
@@ -509,6 +514,7 @@ function hideEnding() {
     document.getElementById('endingScreen').style.visibility = 'hidden';
     document.getElementById('boutonFastRestart').style.visibility = 'hidden';
     document.getElementById('boutonRetourMenu').style.visibility = 'hidden';
+	document.getElementById('endingScore').style.visibility = 'hidden';
 }
 
 function refresh() {
@@ -767,7 +773,6 @@ function remplirZone(i, j, value) {
 }
 
 function labyParfait() {
-    if (field.map[1][1] != -1) {
         var value = field.map[1][1];
         for (var i = 0; i < field.height; i++) {
             for (var j = 0; j < field.width; j++) {
@@ -777,8 +782,4 @@ function labyParfait() {
             }
         }
         return true;
-    }
-    else
-        return false;
-
 }
